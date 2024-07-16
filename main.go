@@ -1,8 +1,16 @@
 package main
 
 import (
+	"context"
+
+	"github.com/tmc/langchaingo/embeddings"
+	"github.com/tmc/langchaingo/llms"
+	"github.com/tmc/langchaingo/llms/openai"
+	"github.com/tmc/langchaingo/vectorstores"
+	"github.com/tmc/langchaingo/vectorstores/weaviate"
 	"github.com/zjj2wry/AiOpsPod/config"
 	"github.com/zjj2wry/AiOpsPod/document"
+	"github.com/zjj2wry/AiOpsPod/llmservice"
 
 	"go.uber.org/zap"
 )
@@ -30,8 +38,49 @@ func main() {
 		}
 	}
 
-	_, err = lds.FetchDocuments()
+	docs, err := lds.FetchDocuments()
 	if err != nil {
 		logger.Error("Error fetching documents", zap.Error(err))
 	}
+
+	var llm llms.Model
+	var vs vectorstores.VectorStore
+
+	if config.LLM.OpenAI != nil {
+		openaiClient, err := openai.New(openai.WithToken(config.LLM.OpenAI.Key), openai.WithEmbeddingModel(config.LLM.EmbeddingModel))
+		if err != nil {
+			logger.Fatal("Error initializing openai client", zap.Error(err))
+		}
+
+		llm = openaiClient
+		e, err := embeddings.NewEmbedder(openaiClient)
+		if err != nil {
+			logger.Fatal("Error initializing embedder", zap.Error(err))
+		}
+		if config.Vector.Weaviate != nil {
+			store, err := weaviate.New(
+				weaviate.WithScheme(config.Vector.Weaviate.Scheme),
+				weaviate.WithHost(config.Vector.Weaviate.Host),
+				weaviate.WithEmbedder(e),
+				weaviate.WithIndexName("aiopspod"))
+			if err != nil {
+				logger.Fatal("Error initializing weaviate", zap.Error(err))
+			}
+			vs = store
+		}
+	}
+
+	llms := llmservice.LLMService{
+		VectorStore: vs,
+		Model:       llm,
+	}
+
+	llms.UpdateDocuments(docs)
+	ctx := context.Background()
+	res, err := llms.Call(ctx, "hello")
+	if err != nil {
+		logger.Fatal("Error answer ops question", zap.Error(err))
+	}
+
+	logger.Info(res)
 }
