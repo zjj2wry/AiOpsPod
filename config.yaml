@@ -1,0 +1,9 @@
+llm:
+  embeddingModel: "bert"
+  openai:
+    key: "your-openai-key"
+
+vector:
+  weaviate:
+    host: "localhost"
+    scheme: "http"
