@@ -21,6 +21,9 @@ vector:
   weaviate:
     host: "test-host"
     scheme: "https"
+document:
+  localDir:
+    directory: sop
 `
 	if err := os.WriteFile(tempFile, []byte(configContent), 0644); err != nil {
 		t.Fatalf("Failed to write temp config file: %v", err)
@@ -52,4 +55,5 @@ vector:
 	assert.NotNil(t, config.Vector.Weaviate)
 	assert.Equal(t, "env-weaviate-host", config.Vector.Weaviate.Host)
 	assert.Equal(t, "env-https", config.Vector.Weaviate.Scheme)
+	assert.Equal(t, "sop", config.Document.LocalDir.Directory)
 }

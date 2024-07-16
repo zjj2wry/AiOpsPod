@@ -8,30 +8,44 @@ import (
 
 // LLM structure
 type LLM struct {
-	EmbeddingModel string  `mapstructure:"embeddingModel" yaml:"embeddingModel"`
-	OpenAI         *OpenAI `mapstructure:"openai" yaml:"openai"`
+	EmbeddingModel string  `yaml:"embeddingModel"`
+	OpenAI         *OpenAI `yaml:"openai"`
+}
+
+type DocumentConfig struct {
+	FeishuConfig *FeishuConfig `yaml:"feishuConfig"`
+	LocalDir     *LocalDir     `yaml:"localDir"`
+}
+
+type LocalDir struct {
+	Directory string ` yaml:"directory"`
+}
+
+// FeishuConfig holds the configuration for Feishu
+type FeishuConfig struct {
 }
 
 // OpenAI structure
 type OpenAI struct {
-	Key string `mapstructure:"key" yaml:"key"`
+	Key string `yaml:"key"`
 }
 
 // Vector structure
 type Vector struct {
-	Weaviate *WEAVIATE `mapstructure:"weaviate" yaml:"weaviate"`
+	Weaviate *WEAVIATE `yaml:"weaviate"`
 }
 
 // WEAVIATE structure
 type WEAVIATE struct {
-	Host   string `mapstructure:"host" yaml:"host"`
-	Scheme string `mapstructure:"scheme" yaml:"scheme"`
+	Host   string `yaml:"host"`
+	Scheme string `yaml:"scheme"`
 }
 
 // Config structure to hold entire configuration
 type Config struct {
-	LLM    LLM    `mapstructure:"llm" yaml:"llm"`
-	Vector Vector `mapstructure:"vector" yaml:"vector"`
+	LLM      LLM             `yaml:"llm"`
+	Vector   Vector          `yaml:"vector"`
+	Document *DocumentConfig `yaml:"document"`
 }
 
 func LoadConfig(path string) (*Config, error) {

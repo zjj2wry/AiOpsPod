@@ -7,3 +7,7 @@ vector:
   weaviate:
     host: "localhost"
     scheme: "http"
+
+document:
+  localDir:
+    directory: sop
