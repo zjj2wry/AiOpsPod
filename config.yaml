@@ -1,11 +1,11 @@
 llm:
-  embeddingModel: "bert"
+  embeddingModel: "text-embedding-ada-002"
   openai:
     key: "your-openai-key"
 
 vector:
   weaviate:
-    host: "localhost"
+    host: "localhost:8080"
     scheme: "http"
 
 document:

@@ -40,3 +40,10 @@ The system architecture is designed to ensure robust and scalable operations:
 | Service   |      | (Log Query)  |     | Agent/Tool      |      |  Runbook  Execution    |
 +-----------+      +--------------+     +-----------------+      +------------------------+
 ```
+
+## Run locally
+Start weaviate vector db
+> If you cann't pull the image in China, add `"registry-mirrors": ["https://dockerhub.icu"]` to `~/.docker/daemon.json` and restart your docker daemon.
+```bash
+docker run -d -p 8080:8080 -p 50051:50051 semitechnologies/weaviate:1.25.8
+```

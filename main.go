@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
+	"github.com/google/uuid"
 	"github.com/tmc/langchaingo/embeddings"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/openai"
@@ -11,7 +14,6 @@ import (
 	"github.com/zjj2wry/AiOpsPod/config"
 	"github.com/zjj2wry/AiOpsPod/document"
 	"github.com/zjj2wry/AiOpsPod/llmservice"
-
 	"go.uber.org/zap"
 )
 
@@ -62,10 +64,13 @@ func main() {
 				weaviate.WithScheme(config.Vector.Weaviate.Scheme),
 				weaviate.WithHost(config.Vector.Weaviate.Host),
 				weaviate.WithEmbedder(e),
-				weaviate.WithIndexName("aiopspod"))
+				weaviate.WithNameSpace(uuid.New().String()),
+				weaviate.WithIndexName("AiOpsPod"+strings.ReplaceAll(uuid.New().String(), "-", "")),
+				weaviate.WithQueryAttrs([]string{"title"}))
 			if err != nil {
 				logger.Fatal("Error initializing weaviate", zap.Error(err))
 			}
+
 			vs = store
 		}
 	}
@@ -77,11 +82,17 @@ func main() {
 
 	ctx := context.Background()
 
-	llms.UpdateDocuments(ctx, docs)
-	res, err := llms.Call(ctx, "hello")
+	_, err = llms.AddDocuments(ctx, docs)
+	if err != nil {
+		logger.Fatal("Error add document", zap.Error(err))
+	}
+
+	logger.Info("documents added")
+
+	res, err := llms.Call(ctx, "Give a prometheus related sop document")
 	if err != nil {
 		logger.Fatal("Error answer ops question", zap.Error(err))
 	}
 
-	logger.Info(res)
+	fmt.Println(res)
 }
