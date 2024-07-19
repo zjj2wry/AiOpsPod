@@ -1,6 +1,7 @@
 package document
 
 import (
+	"github.com/tmc/langchaingo/schema"
 	"go.uber.org/zap"
 )
 
@@ -11,6 +12,6 @@ type FeishuDocumentSource struct {
 	Logger *zap.Logger
 }
 
-func (fds *FeishuDocumentSource) FetchDocuments() ([]Document, error) {
-	return []Document{}, nil
+func (fds *FeishuDocumentSource) FetchDocuments() ([]schema.Document, error) {
+	return []schema.Document{}, nil
 }

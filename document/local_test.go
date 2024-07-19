@@ -67,14 +67,15 @@ func TestLocalDocumentSource_FetchDocuments(t *testing.T) {
 
 	// Check the contents of the documents
 	for _, doc := range documents {
-		expectedContent, exists := testFiles[doc.Title]
+		title := doc.Metadata["title"].(string)
+		expectedContent, exists := testFiles[title]
 		if !exists {
-			t.Errorf("Unexpected document: %s", doc.Title)
+			t.Errorf("Unexpected document: %s", title)
 			continue
 		}
 
-		if doc.Content != expectedContent {
-			t.Errorf("Expected content '%s' for document %s, got '%s'", expectedContent, doc.Title, doc.Content)
+		if doc.PageContent != expectedContent {
+			t.Errorf("Expected content '%s' for document %s, got '%s'", expectedContent, title, doc.PageContent)
 		}
 	}
 }

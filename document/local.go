@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"github.com/tmc/langchaingo/schema"
 	"github.com/zjj2wry/AiOpsPod/config"
 	"go.uber.org/zap"
 )
@@ -17,8 +18,8 @@ type LocalDocumentSource struct {
 	Logger *zap.Logger
 }
 
-func (lds *LocalDocumentSource) FetchDocuments() ([]Document, error) {
-	var documents []Document
+func (lds *LocalDocumentSource) FetchDocuments() ([]schema.Document, error) {
+	var documents []schema.Document
 
 	files, err := ioutil.ReadDir(lds.Directory)
 	if err != nil {
@@ -37,9 +38,11 @@ func (lds *LocalDocumentSource) FetchDocuments() ([]Document, error) {
 			continue
 		}
 
-		documents = append(documents, Document{
-			Title:   file.Name(),
-			Content: string(content),
+		documents = append(documents, schema.Document{
+			Metadata: map[string]interface{}{
+				"title": file.Name(),
+			},
+			PageContent: string(content),
 		})
 	}
 

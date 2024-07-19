@@ -75,8 +75,9 @@ func main() {
 		Model:       llm,
 	}
 
-	llms.UpdateDocuments(docs)
 	ctx := context.Background()
+
+	llms.UpdateDocuments(ctx, docs)
 	res, err := llms.Call(ctx, "hello")
 	if err != nil {
 		logger.Fatal("Error answer ops question", zap.Error(err))

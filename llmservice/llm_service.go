@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/tmc/langchaingo/llms"
+	"github.com/tmc/langchaingo/schema"
 	"github.com/tmc/langchaingo/vectorstores"
-	"github.com/zjj2wry/AiOpsPod/document"
 )
 
 type LLMService struct {
@@ -14,11 +14,12 @@ type LLMService struct {
 	llms.Model
 }
 
-func (d *LLMService) UpdateDocuments(docs []document.Document) {
+func (d *LLMService) UpdateDocuments(ctx context.Context, docs []schema.Document) {
+	d.VectorStore.AddDocuments(ctx, docs)
 }
 
-func (d *LLMService) getSimilarDocument(content string) (*document.Document, error) {
-	return &document.Document{}, nil
+func (d *LLMService) getSimilarDocument(content string) (*schema.Document, error) {
+	return &schema.Document{}, nil
 }
 
 func (d *LLMService) Call(ctx context.Context, prompt string, options ...llms.CallOption) (string, error) {
@@ -26,6 +27,6 @@ func (d *LLMService) Call(ctx context.Context, prompt string, options ...llms.Ca
 	if err != nil {
 		return "", err
 	}
-	newPromt := fmt.Sprintf("Context: \n%s\n+%s", doc.Content, prompt)
+	newPromt := fmt.Sprintf("Context: \n%s\n+%s", doc.PageContent, prompt)
 	return d.Model.Call(ctx, newPromt, options...)
 }

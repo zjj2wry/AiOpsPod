@@ -1,12 +1,10 @@
 package document
 
-// Document represents a standard document structure
-type Document struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
-}
+import (
+	"github.com/tmc/langchaingo/schema"
+)
 
 // DocumentSource interface defines methods to fetch documents
 type DocumentSource interface {
-	FetchDocuments() ([]Document, error)
+	FetchDocuments() ([]schema.Document, error)
 }
