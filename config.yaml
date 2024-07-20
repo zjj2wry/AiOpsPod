@@ -4,6 +4,7 @@ llm:
     key: "your-openai-key"
 
 vector:
+  scoreThreshold: 0.8
   weaviate:
     host: "localhost:8080"
     scheme: "http"
@@ -11,3 +12,6 @@ vector:
 document:
   localDir:
     directory: sop
+
+prometheus:
+  address: "http://localhost:9090"

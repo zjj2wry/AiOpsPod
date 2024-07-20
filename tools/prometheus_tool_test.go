@@ -5,12 +5,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
 
 func TestPrometheusTool_QueryRange(t *testing.T) {
 	// Start the mock Prometheus server
-	server, err := StartMockPrometheusServer(0) // Let it choose a random available port
+	server, err := StartMockPrometheusServer() // Let it choose a random available port
 	if err != nil {
 		t.Fatalf("Failed to start mock Prometheus server: %v", err)
 	}
@@ -20,9 +21,13 @@ func TestPrometheusTool_QueryRange(t *testing.T) {
 	logger, _ := zap.NewDevelopment()
 
 	// Create PrometheusTool instance
-	tool, err := NewPrometheusTool(server.URL, logger)
+	tool, err := NewPrometheusTool(server.URL, logger, WithTimeout(10*time.Second))
 	if err != nil {
 		t.Fatalf("Failed to create PrometheusTool: %v", err)
+	}
+
+	if tool.options.timeout.String() != "10s" {
+		t.Fatalf("timeout option not work")
 	}
 
 	// Define time range
@@ -40,7 +45,5 @@ func TestPrometheusTool_QueryRange(t *testing.T) {
 	expectedOutput := `up{instance="localhost:9090", job="prometheus"} =>
 1 @[1609459200]
 1 @[1609459260]`
-	if output != expectedOutput {
-		t.Errorf("\n'%s'\n'%s'", expectedOutput, output)
-	}
+	assert.Equal(t, expectedOutput, output)
 }

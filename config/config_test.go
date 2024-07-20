@@ -18,12 +18,15 @@ llm:
   openai:
     key: "test-openai-key"
 vector:
+  scoreThreshold: 0.8
   weaviate:
     host: "test-host"
     scheme: "https"
 document:
   localDir:
     directory: sop
+prometheus:
+  address: "http://localhost:9090"
 `
 	if err := os.WriteFile(tempFile, []byte(configContent), 0644); err != nil {
 		t.Fatalf("Failed to write temp config file: %v", err)
@@ -32,6 +35,7 @@ document:
 	// Setup environment variables
 	os.Setenv("LLM_EMBEDDING_MODEL", "env-bert")
 	os.Setenv("OPENAI_API_KEY", "env-openai-key")
+	os.Setenv("OPENAI_MODEL", "env-gpt-3.5-turbo")
 	os.Setenv("WEAVIATE_HOST", "env-weaviate-host")
 	os.Setenv("WEAVIATE_SCHEME", "env-https")
 	defer func() {
@@ -51,9 +55,12 @@ document:
 	assert.Equal(t, "env-bert", config.LLM.EmbeddingModel)
 	assert.NotNil(t, config.LLM.OpenAI)
 	assert.Equal(t, "env-openai-key", config.LLM.OpenAI.Key)
+	assert.Equal(t, "env-gpt-3.5-turbo", config.LLM.OpenAI.Model)
 
 	assert.NotNil(t, config.Vector.Weaviate)
 	assert.Equal(t, "env-weaviate-host", config.Vector.Weaviate.Host)
 	assert.Equal(t, "env-https", config.Vector.Weaviate.Scheme)
+	assert.Equal(t, float32(0.8), config.Vector.ScoreThreshold)
 	assert.Equal(t, "sop", config.Document.LocalDir.Directory)
+	assert.Equal(t, "http://localhost:9090", config.Prometheus.Address)
 }

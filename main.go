@@ -14,6 +14,8 @@ import (
 	"github.com/zjj2wry/AiOpsPod/config"
 	"github.com/zjj2wry/AiOpsPod/document"
 	"github.com/zjj2wry/AiOpsPod/llmservice"
+	aoptools "github.com/zjj2wry/AiOpsPod/tools"
+
 	"go.uber.org/zap"
 )
 
@@ -49,7 +51,7 @@ func main() {
 	var vs vectorstores.VectorStore
 
 	if config.LLM.OpenAI != nil {
-		openaiClient, err := openai.New(openai.WithToken(config.LLM.OpenAI.Key), openai.WithEmbeddingModel(config.LLM.EmbeddingModel))
+		openaiClient, err := openai.New(openai.WithModel(config.LLM.OpenAI.Model), openai.WithToken(config.LLM.OpenAI.Key), openai.WithEmbeddingModel(config.LLM.EmbeddingModel))
 		if err != nil {
 			logger.Fatal("Error initializing openai client", zap.Error(err))
 		}
@@ -75,9 +77,19 @@ func main() {
 		}
 	}
 
+	server, err := aoptools.StartMockPrometheusServer()
+	if err != nil {
+		logger.Fatal("Error start mock prometheus server", zap.Error(err))
+	}
+	defer server.Close()
+
+	config.Prometheus.Address = server.URL
+
 	llms := llmservice.LLMService{
 		VectorStore: vs,
 		Model:       llm,
+		Config:      *config,
+		Logger:      logger,
 	}
 
 	ctx := context.Background()
@@ -89,10 +101,20 @@ func main() {
 
 	logger.Info("documents added")
 
-	res, err := llms.Call(ctx, "Give a prometheus related sop document")
+	res, err := llms.Ask(ctx, "Give a prometheus related sop document")
 	if err != nil {
-		logger.Fatal("Error answer ops question", zap.Error(err))
+		logger.Fatal("Error query promethues metris", zap.Error(err))
 	}
+	fmt.Println("##\n", res)
 
-	fmt.Println(res)
+	res, err = llms.Ask(ctx, "Query `up` metrics")
+	if err != nil {
+		logger.Fatal("Error query promethues metris", zap.Error(err))
+	}
+	fmt.Println("##\n", res)
+	res, err = llms.Ask(ctx, "hello")
+	if err != nil {
+		logger.Fatal("Error query promethues metris", zap.Error(err))
+	}
+	fmt.Println("##\n", res)
 }

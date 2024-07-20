@@ -17,6 +17,7 @@ type PrometheusTool struct {
 	CallbacksHandler callbacks.Handler
 	Client           v1.API
 	Logger           *zap.Logger
+	options          options
 }
 
 var _ tools.Tool = PrometheusTool{}
@@ -36,8 +37,9 @@ func NewPrometheusTool(address string, logger *zap.Logger, opts ...Option) (*Pro
 	}
 
 	return &PrometheusTool{
-		Client: v1.NewAPI(client),
-		Logger: logger,
+		Client:  v1.NewAPI(client),
+		Logger:  logger,
+		options: *options,
 	}, nil
 }
 
@@ -48,8 +50,8 @@ func (t PrometheusTool) Name() string {
 func (t PrometheusTool) Description() string {
 	return `
 	"You have the capability to query Prometheus metrics by PrometheusTool."
-	"Useful for system metrics directly from the tool. "
-	"Action Input required a valid Prometheus query."`
+	"Action Input required a valid Prometheus query."
+	"This tool is only used when querying metrics."`
 }
 
 // TODO: make LLM seed input like `prometheus_expr,startTime,endTime,step`
@@ -73,7 +75,7 @@ func (t PrometheusTool) queryRange(ctx context.Context, query string, startTime,
 	}
 
 	// Execute Prometheus range query
-	result, warnings, err := t.Client.QueryRange(ctx, query, v1.Range{Start: startTime, End: endTime, Step: step})
+	result, warnings, err := t.Client.QueryRange(ctx, query, v1.Range{Start: startTime, End: endTime, Step: step}, v1.WithTimeout(t.options.timeout))
 	if err != nil {
 		if t.CallbacksHandler != nil {
 			t.CallbacksHandler.HandleToolError(ctx, err)
@@ -89,6 +91,8 @@ func (t PrometheusTool) queryRange(ctx context.Context, query string, startTime,
 		t.CallbacksHandler.HandleToolEnd(ctx, result.String())
 	}
 
+	t.Logger.Info("query range", zap.String("result", result.String()))
+
 	return result.String(), nil
 }
 
@@ -96,4 +100,12 @@ func (t PrometheusTool) queryRange(ctx context.Context, query string, startTime,
 type Option func(*options)
 
 // options is a struct that holds the configuration for PrometheusTool.
-type options struct{}
+type options struct {
+	timeout time.Duration
+}
+
+func WithTimeout(timeout time.Duration) Option {
+	return func(o *options) {
+		o.timeout = timeout
+	}
+}

@@ -16,24 +16,4 @@ Objective: To provide guidelines and best practices for managing Kubernetes clus
 - Enable network policies to control traffic flow within the cluster.
 - Regularly update Kubernetes components and apply security patches.
 
-4. Application Deployment:
-- Use Helm charts for managing application deployments in Kubernetes.
-- Implement CI/CD pipelines for automated application deployment and updates.
-- Monitor application performance and scale resources as needed.
-
-5. Disaster Recovery and Backup:
-- Set up regular backups of cluster data and configurations.
-- Implement a disaster recovery plan in case of cluster failures.
-- Test backup and recovery procedures regularly to ensure data integrity.
-
-6. Scaling and Autoscaling:
-- Use Horizontal Pod Autoscaling (HPA) to automatically scale resources based on workload demand.
-- Implement Cluster Autoscaler to adjust the number of nodes in the cluster based on resource utilization.
-- Monitor cluster performance and adjust scaling settings as needed.
-
-7. Troubleshooting and Maintenance:
-- Use kubectl commands and Kubernetes dashboard for troubleshooting cluster issues.
-- Perform regular maintenance tasks like upgrading Kubernetes versions and cleaning up unused resources.
-- Document common troubleshooting steps and best practices for cluster maintenance.
-
 This SOP document should be regularly reviewed and updated to reflect changes in Kubernetes best practices and new features. It should also be shared with all team members responsible for managing Kubernetes clusters to ensure consistency and adherence to guidelines.
