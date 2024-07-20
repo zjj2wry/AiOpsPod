@@ -26,9 +26,7 @@ func TestPrometheusTool_QueryRange(t *testing.T) {
 		t.Fatalf("Failed to create PrometheusTool: %v", err)
 	}
 
-	if tool.options.timeout.String() != "10s" {
-		t.Fatalf("timeout option not work")
-	}
+	assert.Equal(t, "10s", tool.options.timeout.String())
 
 	// Define time range
 	startTime := time.Unix(1609459200, 0) // Example start time

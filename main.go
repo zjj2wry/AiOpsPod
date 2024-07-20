@@ -103,18 +103,18 @@ func main() {
 
 	res, err := llms.Ask(ctx, "Give a prometheus related sop document")
 	if err != nil {
-		logger.Fatal("Error query promethues metris", zap.Error(err))
+		logger.Fatal("Error ask", zap.Error(err))
 	}
 	fmt.Println("##\n", res)
 
 	res, err = llms.Ask(ctx, "Query `up` metrics")
 	if err != nil {
-		logger.Fatal("Error query promethues metris", zap.Error(err))
+		logger.Fatal("Error ask", zap.Error(err))
 	}
 	fmt.Println("##\n", res)
 	res, err = llms.Ask(ctx, "hello")
 	if err != nil {
-		logger.Fatal("Error query promethues metris", zap.Error(err))
+		logger.Fatal("Error ask", zap.Error(err))
 	}
 	fmt.Println("##\n", res)
 }
